@@ -1,0 +1,158 @@
+const int LED1 = 1;
+const int LED2 = 2;
+const int LED3 = 3;
+const int LED4 = 4;
+const int LED5 = 5;
+const int LED6 = 6;
+const int LED7 = 7;
+const int LED8 = 8;
+const int LED9 = 9;
+const int LED10 = 10;
+
+const int buzzer = 11;
+const int buttonTime = 12;
+const int buttonAlarm = 13;
+
+int hour = 1;
+int minute = 0;
+int hourCopy = hour;
+int minuteCopy = minute;
+
+long int miliStart = 0;
+long int miliNow = 0;
+int alarmHour = 0;
+int alarmMinute = 0;
+bool yesAlarm = false;
+
+void setup() {
+  pinMode(LED1,OUTPUT);
+  pinMode(LED2,OUTPUT);
+  pinMode(LED3,OUTPUT);
+  pinMode(LED4,OUTPUT);
+  pinMode(LED5,OUTPUT);
+  pinMode(LED6,OUTPUT);
+  pinMode(LED7,OUTPUT);
+  pinMode(LED8,OUTPUT);
+  pinMode(LED9,OUTPUT);
+  pinMode(LED10,OUTPUT);
+  pinMode(buzzer,OUTPUT);
+  pinMode(buttonTime,INPUT);
+  pinMode(buttonAlarm,INPUT);
+}
+
+void loop() {
+  digitalWrite(LED2,LOW);
+  digitalWrite(LED3,LOW);
+  digitalWrite(LED4,LOW);
+  digitalWrite(LED5,LOW);
+  digitalWrite(LED6,LOW);
+  digitalWrite(LED7,LOW);
+  digitalWrite(LED8,LOW);
+  digitalWrite(LED9,LOW);
+  digitalWrite(LED10,LOW);
+  
+  digitalWrite(buttonTime,HIGH);
+  digitalWrite(buttonAlarm,HIGH);
+
+  hourCopy = hour;
+  minuteCopy = minute;
+  
+  if(hour > 12)
+    hour = 1;
+  if(hourCopy >= 8)
+  {
+    digitalWrite(LED4,HIGH);
+    hourCopy -= 8;
+  }
+  if(hourCopy >= 4)
+  {
+    digitalWrite(LED3,HIGH);
+    hourCopy -= 4;
+  }
+  if(hourCopy >= 2)
+  {
+    digitalWrite(LED2,HIGH);
+    hourCopy -= 2;
+  }
+  if(hourCopy >= 1)
+    digitalWrite(LED1,HIGH);
+
+  
+// minute start
+  if(minute >= 60)
+  {
+    minute = 0;
+    hour++;
+  }
+  if(minuteCopy >= 32)
+  {
+    digitalWrite(LED10,HIGH);
+    minuteCopy -= 32;
+  }
+  if(minuteCopy >= 16)
+  {
+    digitalWrite(LED9,HIGH);
+    minuteCopy -= 16;
+  }
+  if(minuteCopy >= 8)
+  {
+    digitalWrite(LED8,HIGH);
+    minuteCopy -= 8;
+  }
+  if(minuteCopy >= 4)
+  {
+    digitalWrite(LED7,HIGH);
+    minuteCopy -= 4;
+  }
+  if(minuteCopy >= 2)
+  {
+    digitalWrite(LED6,HIGH);
+    minuteCopy -= 2;
+  }
+  if(minuteCopy >= 1)
+    digitalWrite(LED5,HIGH);
+
+
+  if(digitalRead(buttonTime) == LOW)
+  {
+    while(digitalRead(buttonTime) == LOW)
+    {}
+    if(digitalRead(buttonTime) == HIGH)
+      minute += 5;
+  }
+  
+  if(digitalRead(buttonAlarm) == LOW && yesAlarm == false)
+  {
+    while(digitalRead(buttonAlarm) == LOW)
+    {}
+    alarmHour = hour;
+    alarmMinute = minute;
+  }
+
+  if(hour == alarmHour && minute == alarmMinute && yesAlarm == false)
+  {
+    while(digitalRead(buttonAlarm) == LOW)
+    {}
+    tone(buzzer, 900);
+    yesAlarm = true;
+  }
+  
+  if(yesAlarm)
+  {
+    if(digitalRead(buttonAlarm) == LOW)
+    {
+      while(digitalRead(buttonAlarm) == LOW)
+      {}
+      noTone(buzzer);
+      yesAlarm = false;
+    }
+  }
+  
+  miliNow = millis();
+  if(miliNow - miliStart >= 60000)
+  {
+    miliStart = millis();
+    minute++;
+  }
+  delay(30);
+}
